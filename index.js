@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const dbConnect = require("./utils/dbConnect");
 const usersRoutes = require("./routes/v1/users.routes");
 const errorHandler = require("./middleware/errorHandler");
 const { connectToServer } = require("./utils/dbConnect");
@@ -28,7 +27,6 @@ app.get("/", (req, res) => res.send(`<h2>Welcome to Random User Assignment</h2>`
 // if hit the route that not created at
 app.all("*", (req, res) =>
     res.status(404).json({
-        status: 404,
         success: false,
         message: "Request Not Found",
     })
