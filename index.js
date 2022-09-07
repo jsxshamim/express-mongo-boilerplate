@@ -4,6 +4,7 @@ require("dotenv").config();
 const dbConnect = require("./utils/dbConnect");
 const usersRoutes = require("./routes/v1/users.routes");
 const errorHandler = require("./middleware/errorHandler");
+const { connectToServer } = require("./utils/dbConnect");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -11,7 +12,13 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-dbConnect();
+connectToServer((err) => {
+    if (!err) {
+        app.listen(port, () => console.log(`app listening on port ${port}!`));
+    } else {
+        console.log(err);
+    }
+});
 
 app.use("/api/v1/users", usersRoutes);
 app.use("/api/v1/user", usersRoutes);
@@ -29,8 +36,6 @@ app.all("*", (req, res) =>
 
 // handle global error handler
 app.use(errorHandler);
-
-app.listen(port, () => console.log(`app listening on port ${port}!`));
 
 // handle database, server related error handler
 process.on("unhandledRejection", (error) => {

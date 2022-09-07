@@ -19,8 +19,8 @@ const router = express.Router();
 
 // Shorthand
 
-router.route("/").get(limiter, usersController.getUsers).post(usersController.addUser);
+router.route("/").get(usersController.getUsers).post(usersController.addUser);
 
-router.route("/:id").get(viewCount, usersController.getUser).patch(usersController.updateUser).delete(usersController.deleteUser);
+router.route("/:id").get(usersController.getUser).patch(usersController.updateUser).delete(usersController.deleteUser);
 
 module.exports = router;
