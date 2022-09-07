@@ -32,10 +32,10 @@ app.all("*", (req, res) =>
     })
 );
 
-// handle global error handler
+// global error handler
 app.use(errorHandler);
 
-// handle database, server related error handler
+// handle database, server related error
 process.on("unhandledRejection", (error) => {
     console.log(error.name, error.message);
     app.close(() => {

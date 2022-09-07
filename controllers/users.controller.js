@@ -19,16 +19,19 @@ module.exports.getUsers = async (req, res, next) => {
             .project({ address: 0 })
             .limit(+limit)
             .skip(+page * limit);
+        const userCount = await db.collection("user").find().count();
         const users = await cursor.toArray();
+
         if (!users.length) {
             return await res.status(400).json({
                 success: false,
-                error: "no user",
+                error: "Couldn't Find any users",
             });
         }
         await res.status(200).json({
             success: true,
             message: "Users get successfully!",
+            count: userCount,
             data: users,
         });
     } catch (error) {
@@ -49,6 +52,13 @@ module.exports.getUser = async (req, res, next) => {
         }
 
         const user = await db.collection("user").findOne({ _id: ObjectId(id) });
+
+        if (!user) {
+            return await res.status(400).json({
+                success: false,
+                error: "Couldn't Find a User with the ID",
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -84,20 +94,93 @@ module.exports.addUser = async (req, res, next) => {
 };
 
 // update user
-module.exports.updateUser = (req, res) => {
-    const { id } = req.params;
-    const exist = users.find((user) => user.id === Number(id));
+module.exports.updateUser = async (req, res, next) => {
+    try {
+        const db = getDb();
+        const { id } = req.params;
+        if (!ObjectId.isValid(id)) {
+            return await res.status(400).json({
+                success: false,
+                error: "Please insert the valid ID",
+            });
+        }
 
-    exist.age = req.body.age ? req.body.age : exist.age;
-    exist.name = req.body.name ? req.body.name : exist.name;
+        const result = await db.collection("user").updateOne({ _id: ObjectId(id) }, { $set: req.body });
 
-    res.send(exist);
+        if (!result.matchedCount) {
+            return await res.status(400).json({
+                success: false,
+                error: "Couldn't Find the User with the ID",
+            });
+        } else if (!result.modifiedCount) {
+            return await res.status(400).json({
+                success: false,
+                error: "Couldn't Update the User",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "successfully updated the user",
+            data: result,
+        });
+    } catch (error) {
+        await next(error);
+    }
+};
+
+// update multiple users
+module.exports.updateUsers = async (req, res, next) => {
+    try {
+        const db = getDb();
+
+        const result = await db.collection("user").updateOne({ _id: ObjectId(id) }, { $set: req.body });
+        // const result = await db.collection("user").updateMany({ age: { $exists: true } }, { $set: { age: (Math.random(0, 100) * 200).toFixed(0) } });
+
+        if (!result.matchedCount) {
+            return await res.status(400).json({
+                success: false,
+                error: "Couldn't Update the Users",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "successfully update the users",
+            data: result,
+        });
+    } catch (error) {
+        await next(error);
+    }
 };
 
 // delete user
-module.exports.deleteUser = (req, res) => {
-    const { id } = req.params;
-    const remaining = users.filter((user) => user.id !== Number(id));
-    users = remaining;
-    res.send(remaining);
+module.exports.deleteUser = async (req, res, next) => {
+    try {
+        const db = getDb();
+        const { id } = req.params;
+        if (!ObjectId.isValid(id)) {
+            return await res.status(400).json({
+                success: false,
+                error: "Please insert the valid ID",
+            });
+        }
+
+        const result = await db.collection("user").deleteOne({ _id: ObjectId(id) });
+
+        if (!result.deletedCount) {
+            return await res.status(400).json({
+                success: false,
+                error: "Couldn't delete the user",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully Deleted the user",
+            data: result,
+        });
+    } catch (error) {
+        await next(error);
+    }
 };

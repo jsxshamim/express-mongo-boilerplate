@@ -19,7 +19,7 @@ const router = express.Router();
 
 // Shorthand
 
-router.route("/").get(usersController.getUsers).post(usersController.addUser);
+router.route("/").get(usersController.getUsers).post(usersController.addUser).patch(usersController.updateUsers);
 
 router.route("/:id").get(usersController.getUser).patch(usersController.updateUser).delete(usersController.deleteUser);
 
