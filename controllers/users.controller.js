@@ -8,6 +8,7 @@ let users = [
     { id: 4, name: "Kamrul", age: 30 },
 ];
 
+// get all users
 module.exports.getUsers = async (req, res, next) => {
     try {
         const { limit, page } = req.query;
@@ -35,6 +36,7 @@ module.exports.getUsers = async (req, res, next) => {
     }
 };
 
+// get single user
 module.exports.getUser = async (req, res, next) => {
     try {
         const db = getDb();
@@ -58,6 +60,7 @@ module.exports.getUser = async (req, res, next) => {
     }
 };
 
+// add user
 module.exports.addUser = async (req, res, next) => {
     try {
         const db = getDb();
@@ -78,24 +81,9 @@ module.exports.addUser = async (req, res, next) => {
     } catch (error) {
         await next(error);
     }
-
-    // const exist = users.find((user) => user.id === Number(req.body.id));
-    // if (!exist) {
-    //     users.push(req.body);
-    // }
-    // res.status(200).send({
-    //     status: 200,
-    //     success: true,
-    //     message: "add user successfully",
-    //     data: users,
-    // });
-    // res.status(500).send({
-    //     status: 500,
-    //     success: false,
-    //     error: "Internal server error",
-    // });
 };
 
+// update user
 module.exports.updateUser = (req, res) => {
     const { id } = req.params;
     const exist = users.find((user) => user.id === Number(id));
@@ -106,6 +94,7 @@ module.exports.updateUser = (req, res) => {
     res.send(exist);
 };
 
+// delete user
 module.exports.deleteUser = (req, res) => {
     const { id } = req.params;
     const remaining = users.filter((user) => user.id !== Number(id));
